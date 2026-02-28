@@ -5,6 +5,7 @@ use std::io::Error;
 use std::io::{self, Write};
 use std::io::{BufRead, BufReader};
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct Data {
     num1: f64,
     op: char,
@@ -13,9 +14,8 @@ struct Data {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct History {
-    num1: f64,
-    op: char,
-    num2: f64,
+    #[serde(flatten)]
+    data: Data,
     result: f64,
 }
 
@@ -144,7 +144,7 @@ fn read() -> std::io::Result<()> {
             Ok(history) => {
                 println!(
                     " {} {} {} = {}",
-                    history.num1, history.op, history.num2, history.result
+                    history.data.num1, history.data.op, history.data.num2, history.result
                 );
             }
             Err(e) => eprintln!("Failed to parse into JSON: {}", e),
@@ -205,14 +205,7 @@ fn main() -> std::io::Result<()> {
                     Ok(result) => {
                         println!("{}", format_result(num1, op, num2, result));
 
-                        let Data { num1, num2, op } = data;
-
-                        let history = History {
-                            num1,
-                            op,
-                            num2,
-                            result,
-                        };
+                        let history = History { data, result };
 
                         let json_str = serde_json::to_string(&history).unwrap();
                         write(&json_str)?;
