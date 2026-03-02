@@ -12,13 +12,11 @@ fn main() -> std::io::Result<()> {
         let result = calculator::get_int(
             &mut reader,
             &mut stdout,
-            "
-            Please enter;
+            "Please enter:
             1- To use calculator
             2- To see the history
             3- To delete the file
-            4 - To exit
-            ",
+            4 - To exit",
         );
 
         let menu = match result {
@@ -42,9 +40,9 @@ fn main() -> std::io::Result<()> {
                         println!("{}", calculator::format_result(num1, op, num2, result));
 
                         let json_str =
-                            convert_to_json(data, result).map_err(std::io::Error::other)?;
+                            convert_to_json(data, result).map_err(std::io::Error::other)?; //This "map_err" transform the error type
 
-                        calculator::write_history(&json_str, HISTORY_FILE)?; //This .map_err transform the error type
+                        calculator::write_history(&json_str, HISTORY_FILE)?;
                     }
                     Err(msg) => println!("{}", msg),
                 }
