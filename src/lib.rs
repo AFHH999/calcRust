@@ -256,4 +256,72 @@ mod tests {
             "2 + 3 = 5"
         );
     }
+
+    #[test]
+    fn test_from_char_invalid() {
+        // Testing random input be dealt correctly!
+        assert_eq!(Operations::from_char('?'), None);
+        assert_eq!(Operations::from_char(' '), None);
+        assert_eq!(Operations::from_char('\n'), None);
+    }
+
+    #[test]
+    fn test_from_char_valid() {
+        assert_eq!(Operations::from_char('+'), Some(Operations::Addition));
+    }
+
+    #[test]
+    fn test_get_op_recovery() {
+        let input_data = "++\n \nz\n*\n";
+        let mut input = std::io::Cursor::new(input_data);
+        let mut output = Vec::new();
+
+        let result = get_op(&mut input, &mut output, "Op: ");
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), Operations::Multiplication);
+    }
+
+    #[test]
+    fn test_get_float_recovery() {
+        let input_data = "104.53\n";
+        let mut input = std::io::Cursor::new(input_data);
+        let mut output = Vec::new();
+
+        let result = get_float(&mut input, &mut output, "Enter num: ");
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), 104.53);
+    }
+
+    #[test]
+    fn test_get_int_recovery() {
+        let input_data = "150\n";
+        let mut input = std::io::Cursor::new(input_data);
+        let mut output = Vec::new();
+
+        let result = get_int(&mut input, &mut output, "Enter num: ");
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), 150);
+    }
+
+    #[test]
+    fn test_get_int_chaos() {
+        let mut input = std::io::Cursor::new("zbe\n10.5\n100");
+        let mut output = Vec::new();
+
+        let result = get_int(&mut input, &mut output, "Enter an int number: ");
+
+        assert_eq!(result.unwrap(), 100);
+    }
+
+    #[test]
+    fn test_get_float_chaos() {
+        let mut input = std::io::Cursor::new("abc\n44.94");
+        let mut output = Vec::new();
+
+        let result = get_float(&mut input, &mut output, "Enter float number: ");
+
+        assert_eq!(result.unwrap(), 44.94);
+    }
 }
