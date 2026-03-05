@@ -1,10 +1,9 @@
+pub mod db;
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::fs::File;
-use std::fs::OpenOptions;
+use std::io::BufRead;
 use std::io::Error;
 use std::io::Write;
-use std::io::{BufRead, BufReader};
 use std::result::Result;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -20,8 +19,6 @@ pub struct History {
     pub data: Data,
     pub result: f64,
 }
-
-pub const HISTORY_FILE: &str = "history.txt";
 
 impl fmt::Display for Operations {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -55,16 +52,6 @@ impl Operations {
             Operations::Division => '/',
         }
     }
-}
-
-pub fn convert_to_json(data: Data, result: f64) -> Result<String, serde_json::Error> {
-    serde_json::to_string(&History { data, result })
-}
-
-pub fn write_history(json_str: &str, path: &str) -> std::io::Result<()> {
-    let mut file = OpenOptions::new().append(true).create(true).open(path)?;
-    writeln!(file, "{}", json_str)?;
-    Ok(())
 }
 
 pub fn get_int<R: BufRead, W: Write>(
@@ -164,31 +151,6 @@ pub fn calculation(data: &Data) -> Result<f64, String> {
             }
         }
     }
-}
-
-pub fn read_history() -> std::io::Result<()> {
-    let file = File::open(HISTORY_FILE)?;
-    let reader = BufReader::new(file);
-
-    for line in reader.lines() {
-        let line = line?;
-        match serde_json::from_str::<History>(&line) {
-            Ok(history) => {
-                println!(
-                    " {} {} {} = {}",
-                    history.data.num1, history.data.op, history.data.num2, history.result
-                );
-            }
-            Err(e) => eprintln!("Failed to parse into JSON: {}", e),
-        }
-    }
-    Ok(())
-}
-
-pub fn delete_history() -> std::io::Result<()> {
-    std::fs::remove_file(HISTORY_FILE)?;
-    println!("File delete successfully!");
-    Ok(())
 }
 
 pub fn format_result(num1: f64, op: Operations, num2: f64, result: f64) -> String {

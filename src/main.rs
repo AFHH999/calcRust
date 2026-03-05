@@ -1,12 +1,13 @@
 use calculator::Data;
-use calculator::HISTORY_FILE;
-use calculator::convert_to_json;
+use calculator::History;
 use std::io;
 
-fn main() -> std::io::Result<()> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let db = calculator::db::Database::new("history.db")?;
     let stdin = io::stdin();
     let mut stdout = io::stdout();
     let mut reader = stdin.lock();
+    db.create_tables()?;
 
     loop {
         let result = calculator::get_int(
@@ -16,7 +17,7 @@ fn main() -> std::io::Result<()> {
             1- To use calculator
             2- To see the history
             3- To delete the file
-            4 - To exit",
+            4 - To exit\n",
         );
 
         let menu = match result {
@@ -38,33 +39,37 @@ fn main() -> std::io::Result<()> {
                 match calculator::calculation(&data) {
                     Ok(result) => {
                         println!("{}", calculator::format_result(num1, op, num2, result));
-
-                        let json_str =
-                            convert_to_json(data, result).map_err(std::io::Error::other)?; //This "map_err" transform the error type
-
-                        calculator::write_history(&json_str, HISTORY_FILE)?;
+                        let history = History { data, result };
+                        db.save_in_db(&history)?;
                     }
                     Err(msg) => println!("{}", msg),
                 }
             }
-            2 => match calculator::read_history() {
-                Ok(_) => {}
+            2 => match db.read_db() {
+                Ok(histories) => {
+                    for h in histories {
+                        println!(
+                            "{}",
+                            calculator::format_result(
+                                h.data.num1,
+                                h.data.op,
+                                h.data.num2,
+                                h.result,
+                            )
+                        )
+                    }
+                }
                 Err(e) => println!("Read failed: {}", e),
             },
 
-            3 => match calculator::delete_history() {
+            3 => match db.delete_db() {
                 Ok(_) => {}
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                    println!("There is no history to erase!");
-                }
-                Err(e) => return Err(e),
+                Err(e) => return Err(Box::new(e)),
             },
-
             4 => {
                 println!("Until next time!");
                 break;
             }
-
             _ => println!("Invalid option, please try again!"),
         }
     }
