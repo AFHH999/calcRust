@@ -40,7 +40,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Ok(result) => {
                         println!("{}", calculator::format_result(num1, op, num2, result));
                         let history = History { data, result };
-                        db.save_in_db(&history)?;
+                        if let Err(e) = db.save_in_db(&history) {
+                            eprintln!("Warning, the transaction wasn't saved!, error: {}", e);
+                        }
                     }
                     Err(msg) => println!("{}", msg),
                 }
