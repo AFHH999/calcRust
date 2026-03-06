@@ -37,6 +37,7 @@ The binary acts as a controller:
 * **Rust** (2024 Edition)
 * **Arch Linux** (or any Unix-like system)
 * **Tarpaulin** (Optional, for coverage reports)
+* **rusqlite** (Necessary for the data base)
 
 ### Execution
 
