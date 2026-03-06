@@ -68,3 +68,48 @@ impl Database {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{Data, History, Operations};
+
+    fn set_up() -> Database {
+        let db = Database::new(":memory:").unwrap();
+        db.create_tables().unwrap();
+        db
+    }
+
+    #[test]
+    fn test_save_and_read() {
+        let db = set_up();
+        let history = History {
+            data: Data {
+                num1: 2.0,
+                op: Operations::Addition,
+                num2: 3.0,
+            },
+            result: 5.0,
+        };
+        db.save_in_db(&history).unwrap();
+        let results = db.read_db().unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].result, 5.0);
+    }
+
+    #[test]
+    fn test_delete_db() {
+        let db = set_up();
+        let history = History {
+            data: Data {
+                num1: 1.0,
+                op: Operations::Addition,
+                num2: 1.0,
+            },
+            result: 2.0,
+        };
+        db.save_in_db(&history).unwrap();
+        db.delete_db().unwrap();
+        assert_eq!(db.read_db().unwrap().len(), 0);
+    }
+}
