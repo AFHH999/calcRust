@@ -13,7 +13,6 @@ portable and 100% testable.
 The library handles the "Pure" operations:
 
 * **Mathematical Evaluation**: Safe floating-point arithmetic with explicit zero-division checks.
-* **Serialization**: Leveraging `serde` to transform internal states into structured JSON.
 * **I/O Abstraction**: Functions are designed with **Inversion of Control**, accepting paths as arguments to prevent side effects during testing.
 
 ### 2. Interface Layer (`main.rs`)
@@ -26,7 +25,6 @@ The binary acts as a controller:
 
 ## 🛡️ Security & Reliability Features
 
-* **JSON Integrity**: History is stored in structured JSON format, making the logs auditable and resistant to simple "string-injection" corruption.
 * **Panic-Free Design**: Replaces `unwrap()` with robust `match` and `?` operators to handle missing files or corrupted data without terminating the process.
 * **Atomic File Operations**: Uses `OpenOptions` with append/create flags to ensure data persistence follows a predictable, non-destructive path.
 
@@ -42,7 +40,7 @@ The binary acts as a controller:
 ### Execution
 
 Build and run the interactive CLI:
-o run
+cargo run
 
 ## Testing & Validation
 
