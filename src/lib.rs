@@ -1,21 +1,17 @@
 pub mod db;
-use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::io::BufRead;
 use std::io::Error;
 use std::io::Write;
 use std::result::Result;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Data {
     pub num1: f64,
     pub op: Operations,
     pub num2: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
 pub struct History {
-    #[serde(flatten)]
     pub data: Data,
     pub result: f64,
 }
@@ -26,7 +22,7 @@ impl fmt::Display for Operations {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Operations {
     Addition,
     Division,

@@ -3,6 +3,7 @@ use calculator::History;
 use std::io;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // This will catch all error if the have the Error trait
     let db = calculator::db::Database::new("history.db")?;
     let stdin = io::stdin();
     let mut stdout = io::stdout();
@@ -41,6 +42,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         println!("{}", calculator::format_result(num1, op, num2, result));
                         let history = History { data, result };
                         if let Err(e) = db.save_in_db(&history) {
+                            // If the information couldn't be save
+                            //in the db this avoids that the program panics.
                             eprintln!("Warning, the transaction wasn't saved!, error: {}", e);
                         }
                     }
