@@ -54,5 +54,4 @@ cargo-tarpaulin generate a code coverage report (requires `cargo-tarpaulin`):
 # 🛠️ Tech Stack
 
     **Language**: Rust
-    **Serialization**: `serde`, `serde_json`
     **Indentation**: Tabs (for readability and consistency)
